@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CG Reader WASM — Demo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #cg-reader-shell {
+            max-width: 900px;
+            width: 100%;
+            background: #16213e;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+        .cg-reader-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: #0f3460;
+            border-bottom: 2px solid #e94560;
+        }
+        .cg-reader-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #e94560;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+        #cg-reader-page-indicator {
+            font-size: 0.9rem;
+            color: #a0a0b0;
+            font-variant-numeric: tabular-nums;
+        }
+        .cg-reader-viewport {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            background: #0a0a1a;
+            padding: 16px;
+        }
+        .cg-reader-viewport img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+        }
+        .cg-reader-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            background: #0f3460;
+        }
+        .cg-reader-controls button {
+            background: #e94560;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .cg-reader-controls button:hover {
+            background: #d63851;
+        }
+        .cg-reader-controls button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        .cg-reader-controls input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 6px;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        #cg-page-total {
+            font-size: 0.9rem;
+            color: #a0a0b0;
+        }
+        .cg-reader-error {
+            padding: 12px 24px;
+            background: #4a1111;
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            border-top: 1px solid #e94560;
+        }
+        .drop-zone {
+            padding: 40px;
+            text-align: center;
+            border: 2px dashed #555;
+            border-radius: 8px;
+            margin: 24px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #e94560;
+        }
+        .drop-zone p {
+            color: #888;
+        }
+        .drop-zone .browse-link {
+            color: #e94560;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="cg-reader-shell" data-comic-url="" data-password-url="">
+        <div class="cg-reader-header">
+            <h2 id="cg-reader-title">CG Reader WASM</h2>
+            <span id="cg-reader-page-indicator">— / —</span>
+        </div>
+        <div class="cg-reader-viewport">
+            <div class="drop-zone" id="drop-zone">
+                <p>Drop a CBZ or CBR file here</p>
+                <p>or <span class="browse-link" id="browse-link">browse</span></p>
+                <input type="file" id="file-input" accept=".cbz,.cbr,.zip,.rar" style="display:none;">
+            </div>
+            <img id="cg-reader-page" src="" alt="Comic page" style="display:none;">
+        </div>
+        <div class="cg-reader-controls">
+            <button id="cg-btn-prev" type="button" disabled>← Prev</button>
+            <input id="cg-page-input" type="number" min="1" value="1" disabled>
+            <span id="cg-page-total">—</span>
+            <button id="cg-btn-go" type="button" disabled>Go</button>
+            <button id="cg-btn-next" type="button" disabled>Next →</button>
+        </div>
+        <div id="cg-reader-error" class="cg-reader-error" style="display:none;"></div>
+    </div>
+
+    <script src="wasm_exec.js"></script>
+    <script src="cg-reader-wasm.js"></script>
+</body>
+</html>

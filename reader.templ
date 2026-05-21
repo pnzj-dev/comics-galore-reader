@@ -1,0 +1,28 @@
+package cgreaderwasm
+
+templ ReaderShell(attrs templ.Attributes, comicURL string, passwordURL string) {
+	<div
+		{ attrs... }
+		id="cg-reader-shell"
+		data-comic-url={ comicURL }
+		data-password-url={ passwordURL }
+	>
+		<div class="cg-reader-header">
+			<h2 id="cg-reader-title">Loading...</h2>
+			<span id="cg-reader-page-indicator">— / —</span>
+		</div>
+		<div class="cg-reader-viewport">
+			<img id="cg-reader-page" src="" alt="Comic page"/>
+		</div>
+		<div class="cg-reader-controls">
+			<button id="cg-btn-prev" type="button">← Prev</button>
+			<input id="cg-page-input" type="number" min="1" value="1"/>
+			<span id="cg-page-total">—</span>
+			<button id="cg-btn-go" type="button">Go</button>
+			<button id="cg-btn-next" type="button">Next →</button>
+		</div>
+		<div id="cg-reader-error" class="cg-reader-error" style="display:none;"></div>
+		<script src="wasm_exec.js"></script>
+		<script src="cg-reader-wasm.js"></script>
+	</div>
+}
