@@ -191,9 +191,23 @@
 
     function renderSinglePage(current) {
         if (ELEMENTS.pageImg2) ELEMENTS.pageImg2.style.display = 'none';
-        if (ELEMENTS.pageContainer) ELEMENTS.pageContainer.style.flexDirection = '';
-        if (ELEMENTS.pageImg) ELEMENTS.pageImg.style.maxWidth = '';
-        if (ELEMENTS.pageImg2) ELEMENTS.pageImg2.style.maxWidth = '';
+        if (ELEMENTS.pageContainer) {
+            ELEMENTS.pageContainer.style.flexDirection = '';
+            ELEMENTS.pageContainer.style.width = '';
+            ELEMENTS.pageContainer.style.height = '';
+        }
+        if (ELEMENTS.pageImg) {
+            ELEMENTS.pageImg.style.maxWidth = '';
+            ELEMENTS.pageImg.style.maxHeight = '';
+            ELEMENTS.pageImg.style.width = '';
+            ELEMENTS.pageImg.style.height = '';
+        }
+        if (ELEMENTS.pageImg2) {
+            ELEMENTS.pageImg2.style.maxWidth = '';
+            ELEMENTS.pageImg2.style.maxHeight = '';
+            ELEMENTS.pageImg2.style.width = '';
+            ELEMENTS.pageImg2.style.height = '';
+        }
 
         try {
             var data = cgreader.getPage(readerID, current);
@@ -209,7 +223,11 @@
     }
 
     function renderDoublePage(current, total) {
-        if (ELEMENTS.pageContainer) ELEMENTS.pageContainer.style.flexDirection = 'row';
+        if (ELEMENTS.pageContainer) {
+            ELEMENTS.pageContainer.style.flexDirection = 'row';
+            ELEMENTS.pageContainer.style.width = '100%';
+            ELEMENTS.pageContainer.style.height = '100%';
+        }
 
         var leftIdx, rightIdx;
         if (mangaMode) {
@@ -220,8 +238,18 @@
             rightIdx = Math.min(current + 1, total - 1);
         }
 
-        if (ELEMENTS.pageImg)  ELEMENTS.pageImg.style.maxWidth = '50%';
-        if (ELEMENTS.pageImg2) ELEMENTS.pageImg2.style.maxWidth = '50%';
+        if (ELEMENTS.pageImg) {
+            ELEMENTS.pageImg.style.width = '50%';
+            ELEMENTS.pageImg.style.height = '100%';
+            ELEMENTS.pageImg.style.maxWidth = '50%';
+            ELEMENTS.pageImg.style.maxHeight = '100%';
+        }
+        if (ELEMENTS.pageImg2) {
+            ELEMENTS.pageImg2.style.width = '50%';
+            ELEMENTS.pageImg2.style.height = '100%';
+            ELEMENTS.pageImg2.style.maxWidth = '50%';
+            ELEMENTS.pageImg2.style.maxHeight = '100%';
+        }
 
         try {
             var leftData = cgreader.getPage(readerID, leftIdx);
