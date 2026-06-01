@@ -3,7 +3,7 @@ package main
 import (
 	"syscall/js"
 
-	cgreaderwasm "github.com/ponzejo/cg-reader-wasm"
+	cgreaderwasm "github.com/pnzj-dev/comics-galore-reader"
 )
 
 func main() {
