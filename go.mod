@@ -1,4 +1,4 @@
-module github.com/pnzj-dev/cg-reader-wasm
+module github.com/pnzj-dev/comics-galore-reader
 
 go 1.25.1
 
