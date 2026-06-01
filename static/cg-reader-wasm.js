@@ -803,7 +803,8 @@
         }
 
         var go = new Go();
-        WebAssembly.instantiateStreaming(fetch('cg-reader-wasm.wasm'), go.importObject)
+        var wasmURL = (typeof window !== 'undefined' && window.CG_READER_WASM_URL) || 'cg-reader-wasm.wasm';
+        WebAssembly.instantiateStreaming(fetch(wasmURL), go.importObject)
             .then(function (result) {
                 go.run(result.instance);
                 setTimeout(function () {
