@@ -1,4 +1,4 @@
-module github.com/ponzejo/cg-reader-wasm
+module github.com/pnzj-dev/cg-reader-wasm
 
 go 1.25.1
 
