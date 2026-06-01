@@ -7,38 +7,18 @@ import (
 	"syscall/js"
 )
 
-// JSExports registers all ComicReader methods on the global JavaScript object
-// under the namespace "cgreader". Call this from your WASM main() function.
-//
-// Exposed JS API:
-//
-//	cgreader.new(passwordURL?: string, cacheEnabled?: bool) -> readerID
-//	cgreader.openArchive(readerID, data: Uint8Array, filename: string) -> Promise<error?>
-//	cgreader.pageCount(readerID) -> number
-//	cgreader.currentPage(readerID) -> number
-//	cgreader.getPage(readerID, page: number) -> Uint8Array
-//	cgreader.getCurrentPage(readerID) -> Uint8Array
-//	cgreader.next(readerID) -> bool
-//	cgreader.prev(readerID) -> bool
-//	cgreader.setCurrentPage(readerID, page: number) -> error?
-//	cgreader.title(readerID) -> string
-//	cgreader.filename(readerID) -> string
-//	cgreader.setPasswordURL(readerID, url: string)
-//	cgreader.close(readerID)
 var (
 	readers   = make(map[int]*ComicReader)
 	nextID    = 0
 	jsReaders = js.Value{}
 )
 
-// RegisterJS sets up the JavaScript API. Call once from main().
 func RegisterJS() {
 	cg := js.Global().Get("cgreader")
 	if cg.IsUndefined() {
 		cg = js.ValueOf(map[string]interface{}{})
 		js.Global().Set("cgreader", cg)
 	}
-	// If already set up (e.g., object created in JS), use it.
 	if cg.Type() == js.TypeObject {
 		jsReaders = cg
 	} else {
@@ -60,8 +40,6 @@ func RegisterJS() {
 	jsReaders.Set("setPasswordURL", js.FuncOf(jsSetPasswordURL))
 	jsReaders.Set("close", js.FuncOf(jsClose))
 }
-
-// ---- JS Function Implementations ----
 
 func jsNew(this js.Value, args []js.Value) interface{} {
 	passwordURL := ""
@@ -90,9 +68,9 @@ func jsOpenArchive(this js.Value, args []js.Value) interface{} {
 	}
 
 	id := args[0].Int()
-	reader, ok := readers[id]
+	_, ok := readers[id]
 	if !ok {
-		return js.ValueOf(fmt.Sprintf("reader %d not found", id))
+		return js.ValueOf("reader " + fmt.Sprint(id) + " not found")
 	}
 
 	// Convert Uint8Array to []byte.
@@ -101,12 +79,16 @@ func jsOpenArchive(this js.Value, args []js.Value) interface{} {
 
 	filename := args[2].String()
 
-	// Return a Promise since OpenArchive may fetch password asynchronously.
 	handler := js.FuncOf(func(this js.Value, promiseArgs []js.Value) interface{} {
 		resolve := promiseArgs[0]
 		reject := promiseArgs[1]
 
 		go func() {
+			reader, ok := readers[id]
+			if !ok {
+				reject.Invoke(js.ValueOf("reader " + fmt.Sprint(id) + " not found"))
+				return
+			}
 			err := reader.OpenArchive(data, filename)
 			if err != nil {
 				reject.Invoke(js.ValueOf(err.Error()))
@@ -144,19 +126,18 @@ func jsCurrentPage(this js.Value, args []js.Value) interface{} {
 
 func jsGetPage(this js.Value, args []js.Value) interface{} {
 	if len(args) < 2 {
-		return js.ValueOf(fmt.Errorf("getPage requires (readerID, page)"))
+		return js.ValueOf("getPage requires (readerID, page)")
 	}
 	reader, ok := readers[args[0].Int()]
 	if !ok {
-		return js.ValueOf(fmt.Errorf("reader %d not found", args[0].Int()))
+		return js.ValueOf("reader " + fmt.Sprint(args[0].Int()) + " not found")
 	}
 
 	data, err := reader.GetPage(args[1].Int())
 	if err != nil {
-		return js.ValueOf(fmt.Errorf("getPage: %w", err))
+		return js.ValueOf("getPage: " + err.Error())
 	}
 
-	// Return as Uint8Array.
 	dst := js.Global().Get("Uint8Array").New(len(data))
 	js.CopyBytesToJS(dst, data)
 	return dst
@@ -164,9 +145,14 @@ func jsGetPage(this js.Value, args []js.Value) interface{} {
 
 func jsGetCurrentPage(this js.Value, args []js.Value) interface{} {
 	if len(args) < 1 {
-		return js.ValueOf(fmt.Errorf("getCurrentPage requires readerID"))
+		return js.ValueOf("getCurrentPage requires readerID")
 	}
-	return jsGetPage(this, []js.Value{args[0], js.ValueOf(readers[args[0].Int()].CurrentPage())})
+	id := args[0].Int()
+	reader, ok := readers[id]
+	if !ok {
+		return js.ValueOf("reader " + fmt.Sprint(id) + " not found")
+	}
+	return jsGetPage(this, []js.Value{args[0], js.ValueOf(reader.CurrentPage())})
 }
 
 func jsNext(this js.Value, args []js.Value) interface{} {
@@ -197,7 +183,7 @@ func jsSetCurrentPage(this js.Value, args []js.Value) interface{} {
 	}
 	reader, ok := readers[args[0].Int()]
 	if !ok {
-		return js.ValueOf(fmt.Sprintf("reader %d not found", args[0].Int()))
+		return js.ValueOf("reader " + fmt.Sprint(args[0].Int()) + " not found")
 	}
 	err := reader.SetCurrentPage(args[1].Int())
 	if err != nil {
@@ -234,7 +220,7 @@ func jsSetPasswordURL(this js.Value, args []js.Value) interface{} {
 	}
 	reader, ok := readers[args[0].Int()]
 	if !ok {
-		return js.ValueOf(fmt.Sprintf("reader %d not found", args[0].Int()))
+		return js.ValueOf("reader " + fmt.Sprint(args[0].Int()) + " not found")
 	}
 	reader.SetPasswordURL(args[1].String())
 	return nil

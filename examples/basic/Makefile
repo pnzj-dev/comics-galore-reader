@@ -1,32 +1,36 @@
-.PHONY: all build clean serve
+.PHONY: all build clean serve rebuild templ wasm_exec.js
 
-GOROOT ?= $(shell go env GOROOT)
-WASM_EXEC = $(GOROOT)/lib/wasm/wasm_exec.js
+GOROOT     ?= $(shell go env GOROOT)
+WASM_EXEC  = $(GOROOT)/lib/wasm/wasm_exec.js
+WASM_BIN   = cg-reader-wasm.wasm
+PORT       ?= 8080
 
 all: build
 
-# Build the WASM binary.
-build:
-	GOOS=js GOARCH=wasm go build -o cg-reader-wasm.wasm .
-	@echo "Built cg-reader-wasm.wasm"
-
-# Run templ generate to produce reader_templ.go from reader.templ.
 templ:
 	cd ../.. && templ generate
 
-# Copy wasm_exec.js from the Go installation.
+build: templ
+	@echo "Building $(WASM_BIN)..."
+	GOOS=js GOARCH=wasm go build -o $(WASM_BIN) .
+	@ls -lh $(WASM_BIN)
+
 wasm_exec.js:
-	cp "$(WASM_EXEC)" wasm_exec.js
+	@if [ -f "$(WASM_EXEC)" ]; then \
+		cp "$(WASM_EXEC)" wasm_exec.js && echo "Copied wasm_exec.js"; \
+	else \
+		echo "ERROR: wasm_exec.js not found at $(WASM_EXEC)"; exit 1; \
+	fi
 
-# Copy all needed files for serving.
 prepare: build wasm_exec.js
-	@echo "All files ready in examples/basic/"
+	@echo "Ready at http://localhost:$(PORT)"
 
-# Start a local dev server.
 serve: prepare
-	@echo "Serving at http://localhost:8080"
-	python3 -m http.server 8080
+	@python3 serve.py $(PORT) "$$(pwd)"
 
-# Clean build artifacts.
+rebuild:
+	@lsof -ti:$(PORT) | xargs kill -9 2>/dev/null || true
+	@$(MAKE) serve
+
 clean:
-	rm -f cg-reader-wasm.wasm wasm_exec.js
+	rm -f $(WASM_BIN) wasm_exec.js

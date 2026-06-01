@@ -22,6 +22,7 @@
     };
 
     let readerID = null;
+    let zoomLevel = 100;
     let comicURL = '';
     let passwordURL = '';
     let goReady = false;
@@ -36,6 +37,18 @@
     }
 
     // ---- Error display ----
+
+
+    function showSpinner(text) {
+        var s = document.getElementById('cg-spinner');
+        var t = document.getElementById('cg-spinner-text');
+        if (s) s.style.display = 'flex';
+        if (t) t.textContent = text || 'Loading...';
+    }
+    function hideSpinner() {
+        var s = document.getElementById('cg-spinner');
+        if (s) s.style.display = 'none';
+    }
 
     function showError(msg) {
         if (!ELEMENTS.errorBox) return;
@@ -85,7 +98,24 @@
         }
     }
 
+
+    function fitShellToImage() {
+        var img = ELEMENTS.pageImg;
+        if (!img || !img.naturalWidth || !img.naturalHeight) return;
+        var naturalW = img.naturalWidth;
+        var naturalH = img.naturalHeight;
+        var shell = ELEMENTS.shell;
+        var maxW = window.innerWidth * 0.95;
+        var maxH = window.innerHeight * 0.85;
+        var ratio = naturalW / naturalH;
+        var w = Math.min(naturalW, maxW);
+        var h = w / ratio;
+        if (h > maxH) { h = maxH; w = h * ratio; }
+        shell.style.maxWidth = Math.floor(w + 48) + 'px';
+    }
+
     function renderPage() {
+        hideSpinner();
         if (!goReady || readerID === null) return;
 
         try {
@@ -101,6 +131,10 @@
                 }
 
                 ELEMENTS.pageImg.src = url;
+                ELEMENTS.pageImg.onload = function() {
+                    updateZoom();
+                    fitShellToImage();
+                };
                 ELEMENTS.pageImg.style.display = 'block';
                 if (ELEMENTS.dropZone) {
                     ELEMENTS.dropZone.style.display = 'none';
@@ -166,6 +200,7 @@
     // ---- Archive Loading ----
 
     function openArchive(data, filename) {
+        showSpinner("Opening archive...");
         if (!goReady) {
             showError('WASM runtime not ready yet.');
             return;
@@ -198,7 +233,7 @@
 
     function loadFromURL(url, filename) {
         if (!url) return;
-        showError('Loading...');
+        showSpinner('Loading comic...');
         // Temporarily show loading state.
         ELEMENTS.errorBox.style.display = 'block';
         ELEMENTS.errorBox.textContent = 'Loading comic...';
@@ -304,10 +339,32 @@
 
     // ---- Button Events ----
 
+
+    function updateZoom() {
+        var img = ELEMENTS.pageImg;
+        if (img) {
+            img.style.transform = 'scale(' + (zoomLevel / 100) + ')';
+            img.style.transformOrigin = 'top left';
+            img.style.maxWidth = 'none';
+            img.style.maxHeight = 'none';
+        }
+        var label = document.getElementById('cg-zoom-level');
+        if (label) label.textContent = zoomLevel + '%';
+    }
+    function zoomIn() { zoomLevel = Math.min(300, zoomLevel + 25); updateZoom(); }
+    function zoomOut() { zoomLevel = Math.max(25, zoomLevel - 25); updateZoom(); }
+    function zoomReset() { zoomLevel = 100; updateZoom(); }
+
     function setupButtons() {
         if (ELEMENTS.btnPrev) ELEMENTS.btnPrev.addEventListener('click', prevPage);
         if (ELEMENTS.btnNext) ELEMENTS.btnNext.addEventListener('click', nextPage);
         if (ELEMENTS.btnGo) ELEMENTS.btnGo.addEventListener('click', goToPage);
+        var btnZoomIn  = document.getElementById('cg-btn-zoom-in');
+        var btnZoomOut = document.getElementById('cg-btn-zoom-out');
+        var btnZoomReset = document.getElementById('cg-btn-zoom-reset');
+        if (btnZoomIn)  btnZoomIn.addEventListener('click', zoomIn);
+        if (btnZoomOut) btnZoomOut.addEventListener('click', zoomOut);
+        if (btnZoomReset) btnZoomReset.addEventListener('click', zoomReset);
         if (ELEMENTS.pageInput) {
             ELEMENTS.pageInput.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') goToPage();
@@ -376,11 +433,15 @@
 
     // ---- Bootstrap ----
 
+    window.addEventListener('resize', function() { if (ELEMENTS.pageImg && ELEMENTS.pageImg.naturalWidth) { fitShellToImage(); } });
+
     function init() {
         readConfig();
         setupButtons();
         setupFileHandling();
-        initWASM();
+        // Defer WASM init so it doesn't block the page load event.
+        // The 12MB .wasm fetch+compile can trigger Chrome's [Violation] warning.
+        setTimeout(initWASM, 0);
     }
 
     // Start when DOM is ready.
