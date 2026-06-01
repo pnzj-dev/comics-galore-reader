@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+.kbd {
+  display: inline-block;
+  padding: 0.15em 0.4em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  color: #e0e0e0;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+  min-width: 1.6em;
+  text-align: center;
+}
+
+@theme {
+  --color-cg-bg:       #1a1a2e;
+  --color-cg-card:     #16213e;
+  --color-cg-header:   #0f3460;
+  --color-cg-accent:   #e94560;
+  --color-cg-accent-h: #d63851;
+  --color-cg-viewport: #0a0a1a;
+  --color-cg-muted:    #a0a0b0;
+  --color-cg-border:   #555;
+  --color-cg-err-bg:   #4a1111;
+  --color-cg-err-fg:   #ff6b6b;
+  --color-cg-btn-bg:   #333;
+}
+
+@keyframes cg-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Fullscreen chrome auto-hide --- */
+.cg-fullscreen-active .cg-chrome {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.cg-fullscreen-idle .cg-chrome-top {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+.cg-fullscreen-idle .cg-chrome-bottom {
+  opacity: 0;
+  transform: translateY(100%);
+}
+.cg-fullscreen-idle {
+  cursor: none;
+}
+
+/* --- Fullscreen layout --- */
+#cg-reader-shell:fullscreen {
+  max-width: 100vw !important;
+  width: 100vw !important;
+  height: 100vh;
+  border-radius: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+#cg-reader-shell:fullscreen .cg-reader-viewport {
+  flex: 1;
+  max-height: none;
+  min-height: 0;
+}

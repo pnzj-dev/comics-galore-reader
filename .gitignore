@@ -1,2 +1,4 @@
 examples/basic/tailwindcss
 examples/basic/tailwind.css
+examples/basic/wasm_exec.js
+examples/basic/cg-reader-wasm.js

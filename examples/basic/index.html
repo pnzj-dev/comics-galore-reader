@@ -8,10 +8,16 @@
 </head>
 <body class="bg-cg-bg text-[#e0e0e0] flex justify-center items-center min-h-screen">
     <div id="cg-reader-shell" data-comic-url="" data-password-url=""
-         class="bg-cg-card rounded-xl overflow-hidden shadow-2xl max-w-[95vw] min-w-[360px] transition-[width] duration-200">
+         class="bg-cg-card rounded-xl overflow-hidden shadow-2xl max-w-[95vw] min-w-[800px] transition-[width] duration-200">
         <div class="cg-chrome cg-chrome-top flex justify-between items-center px-6 py-4 bg-cg-header border-b-2 border-cg-accent">
             <h2 id="cg-reader-title" class="text-lg font-semibold text-cg-accent truncate max-w-[70%]">CG Reader WASM</h2>
-            <span id="cg-reader-page-indicator" class="text-sm text-cg-muted tabular-nums">— / —</span>
+            <div class="flex items-center gap-2">
+                <button id="cg-btn-close" type="button" title="Close file"
+                        class="bg-transparent text-cg-muted border-0 w-7 h-7 rounded cursor-pointer transition-colors duration-200 hover:text-white hover:bg-cg-btn-bg flex items-center justify-center" style="display:none;">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+                <span id="cg-reader-page-indicator" class="text-sm text-cg-muted tabular-nums">— / —</span>
+            </div>
         </div>
         <div class="cg-chrome cg-chrome-top flex items-center gap-1.5 px-4 py-2 bg-cg-viewport justify-center border-b border-cg-bg">
             <button id="cg-btn-zoom-out" type="button" title="Zoom out"

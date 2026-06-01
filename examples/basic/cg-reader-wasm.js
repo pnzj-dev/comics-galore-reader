@@ -28,6 +28,7 @@
         shortcutsModal: document.getElementById('cg-shortcuts-modal'),
         fsEnterIcon:    document.querySelector('.cg-fs-enter'),
         fsExitIcon:     document.querySelector('.cg-fs-exit'),
+        btnClose:       document.getElementById('cg-btn-close'),
     };
 
     let readerID        = null;
@@ -429,6 +430,65 @@
 
     // ---- Archive Loading ----
 
+    function closeArchive() {
+        stopInfoClock();
+        clearFsIdleTimer();
+
+        [ELEMENTS.pageImg, ELEMENTS.pageImg2].forEach(function (img) {
+            if (img && img.src && img.src.startsWith('blob:')) {
+                URL.revokeObjectURL(img.src);
+            }
+            if (img) img.style.display = 'none';
+        });
+
+        if (readerID !== null) {
+            try { cgreader.close(readerID); } catch (e) { /* ignore */ }
+            readerID = null;
+        }
+
+        doublePageMode = false;
+        mangaMode = false;
+        infoVisible = false;
+        zoomLevel = 100;
+
+        ELEMENTS.title.textContent = 'CG Reader WASM';
+        ELEMENTS.pageInd.textContent = '\u2014 / \u2014';
+        ELEMENTS.pageInput.value = '1';
+        ELEMENTS.pageInput.max = '';
+        ELEMENTS.pageTotal.textContent = '\u2014';
+        ELEMENTS.dropZone.style.display = '';
+        ELEMENTS.infoOverlay.style.display = 'none';
+        ELEMENTS.errorBox.style.display = 'none';
+        ELEMENTS.pageContainer.style.flexDirection = '';
+        ELEMENTS.pageContainer.style.width = '';
+        ELEMENTS.pageContainer.style.height = '';
+        if (ELEMENTS.pageImg) {
+            ELEMENTS.pageImg.style.maxWidth = '';
+            ELEMENTS.pageImg.style.maxHeight = '';
+            ELEMENTS.pageImg.style.width = '';
+            ELEMENTS.pageImg.style.height = '';
+        }
+        if (ELEMENTS.pageImg2) {
+            ELEMENTS.pageImg2.style.maxWidth = '';
+            ELEMENTS.pageImg2.style.maxHeight = '';
+            ELEMENTS.pageImg2.style.width = '';
+            ELEMENTS.pageImg2.style.height = '';
+        }
+
+        [ELEMENTS.btnPrev, ELEMENTS.btnNext, ELEMENTS.btnGo, ELEMENTS.pageInput].forEach(function (el) {
+            if (el) el.disabled = true;
+        });
+
+        ELEMENTS.btnClose.style.display = 'none';
+
+        refreshToolStates();
+        updateZoom();
+
+        if (ELEMENTS.shell) ELEMENTS.shell.style.maxWidth = '';
+        var vp = document.getElementById('cg-reader-viewport');
+        if (vp) vp.style.maxHeight = '';
+    }
+
     function openArchive(data, filename) {
         showSpinner("Opening archive...");
         if (!goReady) {
@@ -446,6 +506,7 @@
         var uint8 = new Uint8Array(data);
         cgreader.openArchive(readerID, uint8, filename)
             .then(function () {
+                if (ELEMENTS.btnClose) ELEMENTS.btnClose.style.display = 'flex';
                 updateUI();
                 renderPage();
             })
@@ -718,6 +779,7 @@
             if (isShortcutsModalOpen()) closeShortcutsModal(); else openShortcutsModal();
         });
         if (ELEMENTS.btnCloseModal) ELEMENTS.btnCloseModal.addEventListener('click', closeShortcutsModal);
+        if (ELEMENTS.btnClose)      ELEMENTS.btnClose.addEventListener('click', closeArchive);
 
         if (ELEMENTS.shortcutsModal) {
             ELEMENTS.shortcutsModal.addEventListener('click', function (e) {
