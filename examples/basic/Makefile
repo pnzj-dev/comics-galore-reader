@@ -1,4 +1,4 @@
-.PHONY: all build clean serve rebuild templ wasm_exec.js
+.PHONY: all build clean serve rebuild templ wasm_exec.js css
 
 GOROOT     ?= $(shell go env GOROOT)
 WASM_EXEC  = $(GOROOT)/lib/wasm/wasm_exec.js
@@ -10,7 +10,11 @@ all: build
 templ:
 	cd ../.. && templ generate
 
-build: templ
+css:
+	@./tailwindcss -i input.css -o tailwind.css 2>&1
+	@echo "Tailwind CSS compiled."
+
+build: templ css
 	@echo "Building $(WASM_BIN)..."
 	GOOS=js GOARCH=wasm go build -o $(WASM_BIN) .
 	@ls -lh $(WASM_BIN)
@@ -33,4 +37,4 @@ rebuild:
 	@$(MAKE) serve
 
 clean:
-	rm -f $(WASM_BIN) wasm_exec.js
+	rm -f $(WASM_BIN) wasm_exec.js tailwind.css
