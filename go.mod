@@ -8,3 +8,5 @@ require (
 )
 
 require github.com/a-h/templ v0.3.1020
+
+retract v0.1.0 // Module path was wrong (cg-reader-wasm); use v0.1.1+.
