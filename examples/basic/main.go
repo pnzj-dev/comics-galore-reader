@@ -1,13 +1,15 @@
+//go:build js && wasm
+
 package main
 
 import (
 	"syscall/js"
 
-	cgreaderwasm "github.com/pnzj-dev/comics-galore-reader"
+	cgreader "github.com/pnzj-dev/comics-galore-reader"
 )
 
 func main() {
-	cgreaderwasm.RegisterJS()
+	cgreader.RegisterJS()
 
 	// Keep the WASM alive.
 	select {}

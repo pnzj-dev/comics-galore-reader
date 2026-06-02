@@ -1,6 +1,9 @@
-package cgreaderwasm
+package cgreader
 
-import "io"
+import (
+	"io"
+	"strings"
+)
 
 // Archive provides a uniform interface for reading comic archives (CBZ, CBR).
 type Archive interface {
@@ -49,7 +52,7 @@ func DetectFormat(filename string) ArchiveFormat {
 			break
 		}
 	}
-	switch ext {
+	switch strings.ToLower(ext) {
 	case "cbz", "zip":
 		return FormatCBZ
 	case "cbr", "rar":

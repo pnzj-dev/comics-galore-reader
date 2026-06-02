@@ -1,4 +1,4 @@
-package cgreaderwasm
+package cgreader
 
 import (
 	"encoding/xml"
@@ -6,24 +6,24 @@ import (
 
 // ComicInfo represents the ComicInfo.xml metadata commonly found in comic archives.
 type ComicInfo struct {
-	XMLName xml.Name `xml:"ComicInfo"`
-	Title   string   `xml:"Title"`
-	Series  string   `xml:"Series"`
-	Number  string   `xml:"Number"`
-	Volume  int      `xml:"Volume"`
-	Summary string   `xml:"Summary"`
-	Writer  string   `xml:"Writer"`
-	Penciller string `xml:"Penciller"`
-	Inker   string   `xml:"Inker"`
-	Colorist string  `xml:"Colorist"`
-	Letterer string  `xml:"Letterer"`
-	CoverArtist string `xml:"CoverArtist"`
-	Publisher string `xml:"Publisher"`
-	Genre    string   `xml:"Genre"`
-	PageCount int    `xml:"PageCount"`
-	Year     int     `xml:"Year"`
-	Month    int     `xml:"Month"`
-	Day      int     `xml:"Day"`
+	XMLName     xml.Name `xml:"ComicInfo"`
+	Title       string   `xml:"Title"`
+	Series      string   `xml:"Series"`
+	Number      string   `xml:"Number"`
+	Volume      int      `xml:"Volume"`
+	Summary     string   `xml:"Summary"`
+	Writer      string   `xml:"Writer"`
+	Penciller   string   `xml:"Penciller"`
+	Inker       string   `xml:"Inker"`
+	Colorist    string   `xml:"Colorist"`
+	Letterer    string   `xml:"Letterer"`
+	CoverArtist string   `xml:"CoverArtist"`
+	Publisher   string   `xml:"Publisher"`
+	Genre       string   `xml:"Genre"`
+	PageCount   int      `xml:"PageCount"`
+	Year        int      `xml:"Year"`
+	Month       int      `xml:"Month"`
+	Day         int      `xml:"Day"`
 }
 
 // ParseComicInfo parses ComicInfo.xml data and returns the structured metadata.

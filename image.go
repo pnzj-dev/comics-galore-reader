@@ -1,4 +1,4 @@
-package cgreaderwasm
+package cgreader
 
 import (
 	"bytes"

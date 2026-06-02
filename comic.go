@@ -1,4 +1,4 @@
-package cgreaderwasm
+package cgreader
 
 import (
 	"errors"
@@ -48,8 +48,8 @@ func WithCacheEnabled(enabled bool) Option {
 // New creates a new ComicReader with the given options.
 func New(opts ...Option) *ComicReader {
 	r := &ComicReader{
-		currentPage: 0,
-		pageCache:   make(map[int][]byte),
+		currentPage:  0,
+		pageCache:    make(map[int][]byte),
 		cacheEnabled: true,
 	}
 	for _, opt := range opts {

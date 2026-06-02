@@ -1,4 +1,4 @@
-package cgreaderwasm
+package cgreader
 
 import (
 	"bytes"
@@ -35,7 +35,6 @@ func (r *RarArchive) Open(data []byte, filename string, password string) error {
 	if err != nil {
 		return fmt.Errorf("opening rar: %w", err)
 	}
-	
 
 	var pageEntries []PageEntry
 	index := 0
@@ -101,7 +100,6 @@ func (r *RarArchive) GetPage(page int) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("re-opening rar: %w", err)
 	}
-	
 
 	// Seek to the target entry.
 	for {
